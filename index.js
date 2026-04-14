@@ -5,30 +5,10 @@ import cookieParser from "cookie-parser";
 import multer from "multer";
 import morgan from "morgan";
 
-import {
-  getPlacesById,
-  updatePlace,
-  getPlacesByUserId,
-  addPlace,
-  getAllPlaces
-} from "./controller/placesController.js";
-
-import {
-  addBooking,
-  getBookingByUserId
-} from "./controller/bookingController.js";
-
-import {
-  uploadPhotoByLink,
-  uploadPhoto
-} from "./controller/photoController.js";
-
-import {
-  registerUser,
-  loginUser,
-  getUser,
-  logout
-} from "./controller/userController.js";
+import * as userController from "./controller/userController.js";
+import * as bookingController from "./controller/bookingController.js";
+import * as photoController from "./controller/photoController.js";
+import * as placesController from "./controller/placesController.js";
 
 import dotenv from "dotenv";
 
@@ -59,26 +39,26 @@ app.use(
 mongoose.connect(process.env.MONGO_URL);
 
 app.get("/test", (req, res) => {
-  res.status(200).json("text ok");
+  res.status(200).json("Welcome to Stayzy - Hotel Booking API");
 });
 
-app.post("/register", registerUser);
-app.post("/login", loginUser);
-app.get("/profile", getUser);
-app.post("/logout", logout);
+app.post("/register", userController.registerUser);
+app.post("/login", userController.loginUser);
+app.get("/profile", userController.getUser);
+app.post("/logout", userController.logout);
 
 const photosMiddleware = multer({ dest: "uploads" });
-app.post("/upload-by-link", uploadPhotoByLink);
-app.post("/upload", photosMiddleware.array("photos", 100), uploadPhoto);
+app.post("/upload", photosMiddleware.array("photos", 100), photoController.uploadPhoto);
+app.post("/upload-by-link", photoController.uploadPhotoByLink);
 
-app.get("/user-places", getPlacesByUserId);
-app.get("/places/:id", getPlacesById);
-app.get("/places", getAllPlaces);
-app.post("/places", addPlace);
-app.put("/places", updatePlace);
+app.get("/user-places", placesController.getPlacesByUserId);
+app.get("/places/:id", placesController.getPlacesById);
+app.get("/places", placesController.getAllPlaces);
+app.post("/places", placesController.addPlace);
+app.put("/places", placesController.updatePlace);
 
-app.post("/bookings", addBooking);
-app.get("/bookings", getBookingByUserId);
+app.post("/bookings", bookingController.addBooking);
+app.get("/bookings", bookingController.getBookingByUserId);
 
 app.listen(port, () => {
   console.log("Server is running on: http://localhost:" + port);
