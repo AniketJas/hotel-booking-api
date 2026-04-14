@@ -1,24 +1,24 @@
-import imageDownloader from "image-downloader";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import cloudinary from "../configs/cloudinary.js";
 
 const uploadPhotoByLink = async (req, res) => {
   try {
-    //upload photo by link
     const { link } = req.body;
-    const newName = "photo" + Date.now() + ".jpg";
 
-    await imageDownloader.image({
-      url: link,
-      dest: process.cwd() + "/uploads/" + newName,
+    const result = await cloudinary.uploader.upload(link, {
+      folder: "stayzy-hotel-booking/uploads",
+      transformation: [
+        { width: 1280, crop: "limit" },
+        { quality: "auto" },
+        { fetch_format: "auto" },
+      ],
     });
-    res.status(201).json(newName);
+
+    res.status(201).json({
+      url: result.secure_url,
+      public_id: result.public_id,
+    });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -27,17 +27,14 @@ const uploadPhoto = async (req, res) => {
   try {
     const uploadedFiles = [];
 
+    // multer-storage-cloudinary already uploads files
     for (let i = 0; i < req.files.length; i++) {
       const file = req.files[i];
 
-      const tempPath = file.path; // multer temp path
-      const ext = path.extname(file.originalname); // safer than split
-      const newPath = tempPath + ext;
-
-      fs.renameSync(tempPath, newPath);
-
-      const filename = path.basename(newPath);
-      uploadedFiles.push(filename);
+      uploadedFiles.push({
+        url: file.path,
+        public_id: file.filename,
+      });
     }
 
     res.status(201).json(uploadedFiles);
@@ -47,7 +44,30 @@ const uploadPhoto = async (req, res) => {
   }
 };
 
+const deletePhoto = async (req, res) => {
+  try {
+    const { public_id } = req.body;
+
+    if (!public_id) {
+      return res.status(400).json({ error: "public_id is required" });
+    }
+
+    const result = await cloudinary.uploader.destroy(public_id, {
+      resource_type: "image",
+    });
+
+    return res.json({
+      success: true,
+      result,
+    });
+  } catch (err) {
+    console.error("Delete Error:", err);
+    res.status(500).json({ error: "Failed to delete image" });
+  }
+};
+
 export {
   uploadPhotoByLink,
   uploadPhoto,
+  deletePhoto,
 };
