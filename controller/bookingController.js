@@ -2,30 +2,40 @@ import BookingModel from "../models/Booking.js";
 import { getUserDataFromToken } from "../middleware/getUserDataFromToken.js";
 
 const addBooking = async (req, res) => {
-  const { place, checkIn, checkOut, noOfGuests, name, phno, price } = req.body;
+  try {
+    const { place, checkIn, checkOut, noOfGuests, name, phno, price } = req.body;
 
-  const userData = await getUserDataFromToken(req);
-  BookingModel.create({
-    place: place,
-    user: userData.id,
-    checkIn: checkIn,
-    checkOut: checkOut,
-    noOfGuests: noOfGuests,
-    name: name,
-    phno: phno,
-    price: price,
-  })
-    .then((doc) => {
-      res.json(doc);
+    const userData = await getUserDataFromToken(req);
+    BookingModel.create({
+      place: place,
+      user: userData.id,
+      checkIn: checkIn,
+      checkOut: checkOut,
+      noOfGuests: noOfGuests,
+      name: name,
+      phno: phno,
+      price: price,
     })
-    .catch((err) => {
-      throw err;
-    });
+      .then((doc) => {
+        res.status(201).json(doc);
+      })
+      .catch((err) => {
+        throw err;
+      });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
 };
 
 const getBookingByUserId = async (req, res) => {
-  const userData = await getUserDataFromToken(req);
-  res.json(await BookingModel.find({ user: userData.id }).populate("place"));
+  try {
+    const userData = await getUserDataFromToken(req);
+    res.status(200).json(await BookingModel.find({ user: userData.id }).populate("place"));
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
 };
 
 export {
