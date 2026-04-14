@@ -7,31 +7,45 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const uploadPhotoByLink = async (req, res) => {
-  //upload photo by link
-  const { link } = req.body;
-  const newName = "photo" + Date.now() + ".jpg";
+  try {
+    //upload photo by link
+    const { link } = req.body;
+    const newName = "photo" + Date.now() + ".jpg";
 
-  await imageDownloader.image({
-    url: link,
-    dest: process.cwd() + "/uploads/" + newName,
-  });
-  res.json(newName);
+    await imageDownloader.image({
+      url: link,
+      dest: process.cwd() + "/uploads/" + newName,
+    });
+    res.status(201).json(newName);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
 };
 
 const uploadPhoto = async (req, res) => {
-  //upload photo from local device
-  const uploadedFiles = [];
-  for (let i = 0; i < req.files.length; i++) {
-    console.log(req.files[i]);
-    const { path, originalname } = req.files[i];
-    const parts = originalname.split(".");
-    const ext = parts[parts.length - 1];
-    const newPath = path + "." + ext;
-    fs.renameSync(path, newPath);
-    uploadedFiles.push(newPath.replace("uploads\\", ""));
+  try {
+    const uploadedFiles = [];
+
+    for (let i = 0; i < req.files.length; i++) {
+      const file = req.files[i];
+
+      const tempPath = file.path; // multer temp path
+      const ext = path.extname(file.originalname); // safer than split
+      const newPath = tempPath + ext;
+
+      fs.renameSync(tempPath, newPath);
+
+      const filename = path.basename(newPath);
+      uploadedFiles.push(filename);
+    }
+
+    res.status(201).json(uploadedFiles);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
   }
-  res.json(uploadedFiles);
-}
+};
 
 export {
   uploadPhotoByLink,
