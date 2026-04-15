@@ -4,6 +4,8 @@ import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import dotenv from "dotenv";
+import cors from 'cors';
+import job from './configs/cron.js';
 
 import userRoutes from "./routes/userRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
@@ -15,7 +17,10 @@ dotenv.config();
 const port = process.env.PORT || 4000;
 const app = express();
 
-app.use(morgan("dev"));
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan("dev"));
+}
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -25,6 +30,10 @@ app.use(
     credentials: true,
   })
 );
+
+if (process.env.NODE_ENV === 'production') {
+  job.start();
+}
 
 mongoose.connect(process.env.MONGO_URL);
 
