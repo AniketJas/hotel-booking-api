@@ -23,7 +23,6 @@ const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
     const userDoc = await UserModel.findOne({ email });
-    // console.log(userDoc);
     if (userDoc) {
       const passOK = bcrypt.compareSync(password, userDoc.password);
 

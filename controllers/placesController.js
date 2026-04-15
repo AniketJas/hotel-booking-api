@@ -5,7 +5,6 @@ const getPlacesById = async (req, res) => {
   try {
     const { id } = req.params;
     const placeData = await PlaceModel.findById(id);
-    console.log(placeData);
     res.status(200).json(placeData);
   } catch (error) {
     console.log(error);
@@ -44,7 +43,6 @@ const addPlace = async (req, res) => {
         maxGuests: maxGuests,
         price: price,
       });
-      console.log(placeDoc);
       res.status(200).json(placeDoc);
     });
 
@@ -106,7 +104,6 @@ const getPlacesByUserId = async (req, res) => {
     jwt.verify(token, process.env.JWT_SECRET, {}, async (err, userData) => {
       const { id } = userData;
       const placeData = await PlaceModel.find({ owner: id });
-      console.log(placeData);
       res.status(200).json(placeData);
     });
   } catch (error) {
