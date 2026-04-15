@@ -1,4 +1,4 @@
-# Hotel Booking Website - Server
+# Stayzy - Hotel Booking Website - Server
 
 A Node.js and Express-based backend API for a hotel booking application built with the MERN stack.
 
@@ -21,14 +21,29 @@ A Node.js and Express-based backend API for a hotel booking application built wi
 
 ```
 server/
-├── controllers/      # Route controllers
+├── configs/
+│   └── cloudinary.js
+├── controllers/
+│   ├── userController.js
+│   ├── placeController.js
+│   ├── photoController.js
+│   └── bookingController.js
+├── middleware/
+│   ├── getUserDataFromToken.js
+│   └── upload.js
 ├── models/          # Database models
 │   ├── User.js
 │   ├── Place.js
 │   └── Booking.js
-├── uploads/         # Uploaded files directory
+├── routes/
+│   ├── userRoutes.js
+│   ├── placeRoutes.js
+│   ├── photoRoutes.js
+│   └── bookingRoutes.js
 ├── index.js         # Entry point
 ├── package.json     # Dependencies
+├── .env             # Environment Variables
+├── .env.example     # Environment Variables Example
 └── README.md        # This file
 ```
 
@@ -42,9 +57,15 @@ server/
    ```
 
 3. Create a `.env` file with necessary environment variables:
+
    ```
-   MONGODB_URI=your_mongodb_connection_string
-   PORT=5000
+   PORT=4000
+   JWT_SECRET=your_jwt_secret
+   MONGO_URL=your_mongodb_connection_string
+
+   CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+   CLOUDINARY_API_KEY=your_cloudinary_api_key
+   CLOUDINARY_API_SECRET=your_cloudinary_api_secret
    ```
 
 ## Usage
@@ -55,7 +76,7 @@ Start the development server:
 npm start
 ```
 
-The API will be available at `http://localhost:5000`
+The API will be available at `http://localhost:4000`
 
 ## Models
 
