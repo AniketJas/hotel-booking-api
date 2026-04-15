@@ -4,7 +4,6 @@ import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import dotenv from "dotenv";
-import cors from 'cors';
 import job from './configs/cron.js';
 
 import userRoutes from "./routes/userRoutes.js";
@@ -23,10 +22,11 @@ if (process.env.NODE_ENV === 'development') {
 
 app.use(express.json());
 app.use(cookieParser());
+app.set("trust proxy", 1);
 
 app.use(
   cors({
-    origin: ["http://localhost:5173"], // scalable for multiple origins
+    origin: ["https://stayzy-hotel-booking.vercel.app/"], // scalable for multiple origins
     credentials: true,
   })
 );
