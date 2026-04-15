@@ -34,11 +34,20 @@ const loginUser = async (req, res) => {
           {},
           (err, token) => {
             if (err) throw err;
+
+            const isProd = process.env.NODE_ENV === "production";
+
             res.cookie("token", token, {
               httpOnly: true,
-              secure: true,
-              sameSite: "none"
+              secure: isProd,
+              sameSite: isProd ? "none" : "lax",
             }).json(userDoc);
+
+            // res.cookie("token", token, {
+            //   httpOnly: true,
+            //   secure: true,
+            //   sameSite: "none"
+            // }).json(userDoc);
           }
         );
       } else {
@@ -73,7 +82,12 @@ const getUser = async (req, res) => {
 };
 
 const logout = (req, res) => {
-  res.cookie("token", "").json(true);
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "none",
+  });
+  res.json(true);
 };
 
 export {
